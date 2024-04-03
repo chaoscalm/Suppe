@@ -24,7 +24,7 @@ public class Main implements IXposedHookZygoteInit {
 
     @Override
     public void initZygote(StartupParam startupParam) throws Throwable {
-        XposedBridge.log("TrustMeNot loading...");
+        XposedBridge.log("Suppe loading...");
         int hookedMethods = 0;
 
         for (Method method : findClass(SSL_CLASS_NAME, null).getDeclaredMethods()) {
@@ -65,7 +65,7 @@ public class Main implements IXposedHookZygoteInit {
             }
         }
 
-        XposedBridge.log(String.format(Locale.ENGLISH, "TrustMeNot loaded! Hooked %d methods", hookedMethods));
+        XposedBridge.log(String.format(Locale.ENGLISH, "Suppe loaded! Hooked %d methods", hookedMethods));
     }
 
     private boolean checkSSLMethod(Method method) {
