@@ -15,7 +15,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    namespace 'com.suppe.trustmealready'
+    namespace 'se.sopa.trustmenot'
     buildToolsVersion '34.0.0'
 }
 
