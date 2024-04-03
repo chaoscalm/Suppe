@@ -8,10 +8,10 @@ Suppe is an Xposed module to disable SSL verification and pinning on Android usi
 
 ## Requirements
 * An Xposed-compatible hooking system. 
-    * [LSPosed](https://github.com/LSPosed/LSPosed) (Android 13)  
+    * [LSPosed](https://github.com/LSPosed/LSPosed) (Android 14)  
 
 ## Tested
-* Android 13.0, ARM64, LSPosed 1.9.2
+* Android 14.0, ARM64, LSPosed 1.9.2
 
 ## Troubleshooting
 * Some apps implement custom certificate checking, bypassing this hook. Try sniffing Chromium traffic, if you don't get an invalid certificate error then this module is working as it should.
