@@ -1,4 +1,4 @@
-package com.suppe.trustmealready;
+package se.sopa.trustmenot;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -24,7 +24,7 @@ public class Main implements IXposedHookZygoteInit {
 
     @Override
     public void initZygote(StartupParam startupParam) throws Throwable {
-        XposedBridge.log("TrustMeAlready loading...");
+        XposedBridge.log("TrustMeNot loading...");
         int hookedMethods = 0;
 
         for (Method method : findClass(SSL_CLASS_NAME, null).getDeclaredMethods()) {
@@ -65,7 +65,7 @@ public class Main implements IXposedHookZygoteInit {
             }
         }
 
-        XposedBridge.log(String.format(Locale.ENGLISH, "TrustMeAlready loaded! Hooked %d methods", hookedMethods));
+        XposedBridge.log(String.format(Locale.ENGLISH, "TrustMeNot loaded! Hooked %d methods", hookedMethods));
     }
 
     private boolean checkSSLMethod(Method method) {
