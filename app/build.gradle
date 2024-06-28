@@ -6,8 +6,8 @@ android {
         applicationId 'se.sopa.trustmenot'
         minSdk 24
         targetSdk 34
-        versionCode 10
-        versionName '1.20'
+        versionCode 1
+        versionName '1.3'
     }
         buildTypes {
         release {
@@ -16,7 +16,6 @@ android {
         }
     }
     namespace 'se.sopa.trustmenot'
-    buildToolsVersion '34.0.0'
 }
 
 dependencies {
