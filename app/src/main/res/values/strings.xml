@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Suppe</string>
+    <string name="xposedDescription">Disable SSL verification and pinning</string>
+</resources>

@@ -1,0 +1,92 @@
+name: build
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+
+    - name: Setup JDK 17
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'adopt'
+        java-version: '17'
+
+    - name: Install Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x ./gradlew
+
+    - name: Build with Gradle
+      run: ./gradlew assembleDebug
+
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-debug.apk
+        path: app/build/outputs/apk/debug/app-debug.apk
+
+    - name: Get latest tag
+      id: get_latest_tag
+      uses: actions/github-script@v6
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        script: |
+          const { getOctokit } = require('@actions/github');
+          const coreIdentifier = require('@actions/core');
+          const githubContext = require('@actions/github').context;
+          const token = process.env.GITHUB_TOKEN;
+          const octokit = getOctokit(token);
+
+          async function getLatestTag() {
+            const { data: tags } = await octokit.rest.repos.listTags({
+              owner: githubContext.repo.owner,
+              repo: githubContext.repo.repo,
+              per_page: 1,
+            });
+            if (tags.length === 0) {
+              return 'v1.0.0';
+            } else {
+              const latestTag = tags[0].name;
+              const versionParts = latestTag.replace('v', '').split('.');
+              versionParts[2] = parseInt(versionParts[2]) + 1;
+              return `v${versionParts.join('.')}`;
+            }
+          }
+
+          const newTag = await getLatestTag();
+          coreIdentifier.setOutput('tag', newTag);
+
+    - name: Create release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.get_latest_tag.outputs.tag }}
+        release_name: Release ${{ steps.get_latest_tag.outputs.tag }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: app/build/outputs/apk/debug/app-debug.apk
+        asset_name: app-debug.apk
+        asset_content_type: application/vnd.android.package-archive

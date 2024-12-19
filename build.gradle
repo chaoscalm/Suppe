@@ -1,0 +1,24 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://api.xposed.info/' }        
+    }
+	
+    dependencies {
+	// https://developer.android.com/studio/releases/gradle-plugin
+        classpath 'com.android.tools.build:gradle:8.7.3'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://api.xposed.info/' }
+    }
+}
+
+tasks.register('clean', Delete) {
+    delete rootProject.getLayout().getBuildDirectory()
+}

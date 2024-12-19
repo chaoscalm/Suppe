@@ -1,0 +1,15 @@
+{
+  "name": "suppe",
+  "version": "1.0.0",
+  "description": "Xposed module to disable SSL verification and pinning on Android",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@actions/github": "^5.0.0",
+    "@actions/core": "^1.10.0"
+  },
+  "author": "",
+  "license": "ISC"
+}
