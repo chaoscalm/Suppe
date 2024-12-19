@@ -26,3 +26,5 @@ Suppe is an Xposed module to disable SSL certificate verification on Android usi
 * [jpacg](https://github.com/jpacg/TrustMeAlready) Updated dependencies and Main.java
   
 * [D3fau4](https://github.com/D3fau4/TrustMeAlready) Updated dependencies and refactor
+
+* [SebaUbuntu](https://github.com/SebaUbuntu) Template for build.yml
