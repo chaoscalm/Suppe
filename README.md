@@ -1,5 +1,6 @@
 # Suppe
-![output](https://github.com/user-attachments/assets/c42e5704-0a83-427a-9ef8-35e8a29c0cea)
+![348538810-c42e5704-0a83-427a-9ef8-35e8a29c0cea](https://github.com/user-attachments/assets/ce3c7949-daf6-4009-b0fe-58951da56ddb)
+
 
 
 
