@@ -1,5 +1,5 @@
 {
-  "name": "suppe",
+  "name": "Suppe",
   "version": "1.0.0",
   "description": "Xposed module to disable SSL verification and pinning on Android",
   "main": "index.js",
