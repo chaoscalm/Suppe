@@ -46,7 +46,6 @@ jobs:
       with:
         script: |
           const { getOctokit } = require('@actions/github');
-          const coreIdentifier = require('@actions/core');
           const githubContext = require('@actions/github').context;
           const token = process.env.GITHUB_TOKEN;
           const octokit = getOctokit(token);
@@ -68,7 +67,7 @@ jobs:
           }
 
           const newTag = await getLatestTag();
-          coreIdentifier.setOutput('tag', newTag);
+          core.setOutput('tag', newTag);
 
     - name: Create release
       id: create_release
