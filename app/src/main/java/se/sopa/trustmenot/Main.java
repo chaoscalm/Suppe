@@ -18,7 +18,9 @@ import static de.robv.android.xposed.XposedHelpers.*;
 public class Main implements IXposedHookZygoteInit {
 
     private static final String SSL_CLASS_NAME = "com.android.org.conscrypt.TrustManagerImpl";
+    private static final String CONSCRYPT_SOCKET_CLASS_NAME = "com.android.org.conscrypt.ConscryptFileDescriptorSocket";
     private static final String SSL_METHOD_NAME = "checkTrustedRecursive";
+    private static final String SOCKET_METHOD_NAME = "verifyCertificateChain";
     private static final Class<?> SSL_RETURN_TYPE = List.class;
     private static final Class<?> SSL_RETURN_PARAM_TYPE = X509Certificate.class;
 
@@ -27,45 +29,38 @@ public class Main implements IXposedHookZygoteInit {
         XposedBridge.log("Suppe loading...");
         int hookedMethods = 0;
 
-        for (Method method : findClass(SSL_CLASS_NAME, null).getDeclaredMethods()) {
-            if (!checkSSLMethod(method)) {
-                continue;
-            }
+        hookedMethods += hookMethods(SSL_CLASS_NAME, SSL_METHOD_NAME, this::checkSSLMethod);
+        hookedMethods += hookMethods(CONSCRYPT_SOCKET_CLASS_NAME, SOCKET_METHOD_NAME, method -> method.getName().equals(SOCKET_METHOD_NAME));
 
-            List<Object> params = new ArrayList<>();
-            params.addAll(Arrays.asList(method.getParameterTypes()));
-            params.add(new XC_MethodReplacement() {
-                @Override
-                protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
-                    return new ArrayList<X509Certificate>();
+        XposedBridge.log(String.format(Locale.ENGLISH, "Suppe loaded! Hooked %d methods", hookedMethods));
+    }
+
+    private int hookMethods(String className, String methodName, MethodChecker checker) {
+        int count = 0;
+        try {
+            for (Method method : findClass(className, null).getDeclaredMethods()) {
+                if (!checker.check(method)) {
+                    continue;
                 }
-            });
 
-            XposedBridge.log("Hooking method:");
-            XposedBridge.log(method.toString());
-            findAndHookMethod(SSL_CLASS_NAME, null, SSL_METHOD_NAME, params.toArray());
-            hookedMethods++;
-        }
-
-        for (Method method : findClass("com.android.org.conscrypt.ConscryptFileDescriptorSocket", null).getDeclaredMethods()) {
-            if (method.getName().equals("verifyCertificateChain")) {
-                List<Object> params = new ArrayList<>();
-                params.addAll(Arrays.asList(method.getParameterTypes()));
+                List<Object> params = new ArrayList<>(Arrays.asList(method.getParameterTypes()));
                 params.add(new XC_MethodReplacement() {
                     @Override
                     protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
-                        return null;
+                        return methodName.equals(SSL_METHOD_NAME) ? new ArrayList<X509Certificate>() : null;
                     }
                 });
+
                 XposedBridge.log("Hooking method:");
                 XposedBridge.log(method.toString());
-                findAndHookMethod("com.android.org.conscrypt.ConscryptFileDescriptorSocket", null, "verifyCertificateChain", params.toArray());
-                hookedMethods++;
-
+                findAndHookMethod(className, null, methodName, params.toArray());
+                count++;
             }
+        } catch (Throwable t) {
+            XposedBridge.log("Failed to hook methods for class: " + className);
+            XposedBridge.log(t);
         }
-
-        XposedBridge.log(String.format(Locale.ENGLISH, "Suppe loaded! Hooked %d methods", hookedMethods));
+        return count;
     }
 
     private boolean checkSSLMethod(Method method) {
@@ -73,23 +68,20 @@ public class Main implements IXposedHookZygoteInit {
             return false;
         }
 
-        // check return type
         if (!SSL_RETURN_TYPE.isAssignableFrom(method.getReturnType())) {
             return false;
         }
 
-        // check if parameterized return type
         Type returnType = method.getGenericReturnType();
         if (!(returnType instanceof ParameterizedType)) {
             return false;
         }
 
-        // check parameter type
         Type[] args = ((ParameterizedType) returnType).getActualTypeArguments();
-        if (args.length != 1 || !(args[0].equals(SSL_RETURN_PARAM_TYPE))) {
-            return false;
-        }
+        return args.length == 1 && args[0].equals(SSL_RETURN_PARAM_TYPE);
+    }
 
-        return true;
+    private interface MethodChecker {
+        boolean check(Method method);
     }
 }
